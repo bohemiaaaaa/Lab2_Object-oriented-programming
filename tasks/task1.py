@@ -8,7 +8,7 @@ if __name__ == "__main__":
     triangle.read()
     triangle.display()
 
-    print(f"\nИспользование перегруженных операторов:")
+    print("\nИспользование перегруженных операторов:")
     print(f"str(triangle): {triangle}")
     print(f"float(triangle): {float(triangle):.2f}")
     print(f"int(triangle): {int(triangle)}")
