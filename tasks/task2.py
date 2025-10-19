@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from tasks.library_package.library_model import Book, Subscriber
+from library_package.library_model import Book, Subscriber
 
 
 def main():
