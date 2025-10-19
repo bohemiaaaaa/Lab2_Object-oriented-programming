@@ -45,12 +45,17 @@ class RightTrianglePair:
         return sqrt(self.first**2 + self.second**2)
 
     def __str__(self) -> str:
-        return f"RightTrianglePair({self.first:.0f}, {self.second:.0f})" if self.first.is_integer() and self.second.is_integer() else f"RightTrianglePair({self.first}, {self.second})"
+        return (
+            f"RightTrianglePair({self.first:.0f}, {self.second:.0f})"
+            if self.first.is_integer() and self.second.is_integer()
+            else f"RightTrianglePair({self.first}, {self.second})"
+        )
 
     def __repr__(self) -> str:
         first = int(self.first) if self.first.is_integer() else self.first
         second = int(self.second) if self.second.is_integer() else self.second
         return f"RightTrianglePair({first}, {second})"
+
     def __eq__(self, other) -> bool:
         if isinstance(other, RightTrianglePair):
             return self.first == other.first and self.second == other.second
@@ -81,14 +86,15 @@ class RightTrianglePair:
 
     def __add__(self, other):
         if isinstance(other, RightTrianglePair):
-            return RightTrianglePair(self.first + other.first, self.second + other.second)
+            return RightTrianglePair(
+                self.first + other.first, self.second + other.second
+            )
         return NotImplemented
 
     def __sub__(self, other):
         if isinstance(other, RightTrianglePair):
             return RightTrianglePair(
-                max(0.1, self.first - other.first),
-                max(0.1, self.second - other.second)
+                max(0.1, self.first - other.first), max(0.1, self.second - other.second)
             )
         return NotImplemented
 
@@ -110,8 +116,7 @@ class RightTrianglePair:
     def __rsub__(self, other):
         if isinstance(other, (int, float)):
             return RightTrianglePair(
-                max(0.1, other - self.first),
-                max(0.1, other - self.second)
+                max(0.1, other - self.first), max(0.1, other - self.second)
             )
         return NotImplemented
 

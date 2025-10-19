@@ -21,15 +21,21 @@ class TestRightTrianglePair:
         assert triangle.hypotenuse == 5.0
 
     def test_negative_first_cathetus(self):
-        with pytest.raises(ValueError, match="Катеты должны быть положительными числами"):
+        with pytest.raises(
+            ValueError, match="Катеты должны быть положительными числами"
+        ):
             RightTrianglePair(-1, 4)
 
     def test_negative_second_cathetus(self):
-        with pytest.raises(ValueError, match="Катеты должны быть положительными числами"):
+        with pytest.raises(
+            ValueError, match="Катеты должны быть положительными числами"
+        ):
             RightTrianglePair(3, -1)
 
     def test_zero_cathetus(self):
-        with pytest.raises(ValueError, match="Катеты должны быть положительными числами"):
+        with pytest.raises(
+            ValueError, match="Катеты должны быть положительными числами"
+        ):
             RightTrianglePair(0, 4)
 
     def test_equality(self):
@@ -49,7 +55,7 @@ class TestRightTrianglePair:
 
     def test_greater_than(self):
         t1 = RightTrianglePair(5, 12)  # гипотенуза = 13
-        t2 = RightTrianglePair(3, 4)   # гипотенуза = 5
+        t2 = RightTrianglePair(3, 4)  # гипотенуза = 5
         assert t1 > t2
 
     def test_addition(self):
@@ -153,5 +159,7 @@ class TestMakeRightTrianglePair:
         assert triangle.second == 4
 
     def test_make_function_invalid(self):
-        with pytest.raises(ValueError, match="Катеты должны быть положительными числами"):
+        with pytest.raises(
+            ValueError, match="Катеты должны быть положительными числами"
+        ):
             make_right_triangle_pair(-1, 4)
