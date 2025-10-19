@@ -246,6 +246,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "pandas" },
+    { name = "pre-commit" },
     { name = "pyarrow" },
 ]
 
@@ -267,6 +268,7 @@ requires-dist = [
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.13.2" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.13.0" },
     { name = "pandas", specifier = ">=2.2.2" },
+    { name = "pre-commit", specifier = ">=4.3.0" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.0.1" },
     { name = "pyarrow", specifier = ">=15.0.2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.3" },
