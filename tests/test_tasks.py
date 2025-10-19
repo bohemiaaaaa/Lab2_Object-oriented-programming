@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, timedelta
+
 import pytest
+from library_package.library_model import Book, BorrowedBook, Debt, Subscriber
 from triangle_model import RightTrianglePair, make_right_triangle_pair
 
 
@@ -163,3 +166,198 @@ class TestMakeRightTrianglePair:
             ValueError, match="Катеты должны быть положительными числами"
         ):
             make_right_triangle_pair(-1, 4)
+
+
+class TestLibraryModel:
+    def test_book_creation(self):
+        book = Book("Толстой", "Война и мир", 1869, "Эксмо", 1500.0)
+        assert book.author == "Толстой"
+        assert book.title == "Война и мир"
+        assert book.year == 1869
+        assert book.publisher == "Эксмо"
+        assert book.price == 1500.0
+
+    def test_book_negative_year(self):
+        with pytest.raises(ValueError, match="Год издания не может быть отрицательным"):
+            Book("Автор", "Книга", -1, "Издательство", 100.0)
+
+    def test_book_negative_price(self):
+        with pytest.raises(ValueError, match="Цена не может быть отрицательной"):
+            Book("Автор", "Книга", 2024, "Издательство", -100.0)
+
+    def test_book_equality(self):
+        book1 = Book("Автор", "Книга", 2024, "Издательство", 100.0)
+        book2 = Book("Автор", "Книга", 2024, "Издательство", 100.0)
+        book3 = Book("Другой", "Книга", 2024, "Издательство", 100.0)
+
+        assert book1 == book2
+        assert book1 != book3
+
+    def test_subscriber_creation(self):
+        subscriber = Subscriber("Иванов", "LIB001", 50)
+
+        assert subscriber.name == "Иванов"
+        assert subscriber.library_id == "LIB001"
+        assert subscriber.size == 50
+        assert subscriber.count == 0
+
+    def test_subscriber_size_method(self):
+        subscriber = Subscriber("Иванов", "LIB001", 50)
+        assert subscriber.get_size() == 50
+
+    def test_subscriber_add_book(self):
+        subscriber = Subscriber("Иванов", "LIB001", 5)
+        book = Book("Автор", "Книга", 2024, "Издательство", 100.0)
+
+        subscriber.add_book(book)
+        assert len(subscriber) == 1
+        assert subscriber.count == 1
+        assert book in subscriber
+
+    def test_subscriber_add_book_limit(self):
+        subscriber = Subscriber("Иванов", "LIB001", 2)
+        book1 = Book("Автор1", "Книга1", 2024, "Издательство", 100.0)
+        book2 = Book("Автор2", "Книга2", 2024, "Издательство", 100.0)
+        book3 = Book("Автор3", "Книга3", 2024, "Издательство", 100.0)
+
+        subscriber.add_book(book1)
+        subscriber.add_book(book2)
+
+        with pytest.raises(ValueError, match="Достигнут лимит книг: 2"):
+            subscriber.add_book(book3)
+
+    def test_subscriber_remove_book(self):
+        subscriber = Subscriber("Иванов", "LIB001", 5)
+        book = Book("Автор", "Книга", 2024, "Издательство", 100.0)
+
+        subscriber.add_book(book)
+        assert len(subscriber) == 1
+
+        subscriber.remove_book(book)
+        assert len(subscriber) == 0
+        assert subscriber.count == 0
+
+    def test_subscriber_getitem(self):
+        subscriber = Subscriber("Иванов", "LIB001", 5)
+        book = Book("Автор", "Книга", 2024, "Издательство", 100.0)
+
+        subscriber.add_book(book)
+        assert subscriber[0].book == book
+
+    def test_subscriber_getitem_invalid_index(self):
+        subscriber = Subscriber("Иванов", "LIB001", 5)
+
+        with pytest.raises(IndexError, match="Индекс вне диапазона"):
+            _ = subscriber[10]
+
+    def test_subscriber_setitem(self):
+        subscriber = Subscriber("Иванов", "LIB001", 5)
+        book1 = Book("Автор1", "Книга1", 2024, "Издательство", 100.0)
+        book2 = Book("Автор2", "Книга2", 2024, "Издательство", 200.0)
+
+        subscriber.add_book(book1)
+        borrowed = subscriber[0]
+        borrowed.book = book2
+        subscriber[0] = borrowed
+
+        assert subscriber[0].book == book2
+
+    def test_subscriber_find_by_author(self):
+        subscriber = Subscriber("Иванов", "LIB001", 5)
+        book1 = Book("Толстой", "Книга1", 2024, "Издательство", 100.0)
+        book2 = Book("Пушкин", "Книга2", 2024, "Издательство", 200.0)
+        book3 = Book("Толстой", "Книга3", 2024, "Издательство", 300.0)
+
+        subscriber.add_book(book1)
+        subscriber.add_book(book2)
+        subscriber.add_book(book3)
+
+        result = subscriber.find_by_author("Толстой")
+        assert len(result) == 2
+        assert all(borrowed.book.author == "Толстой" for borrowed in result)
+
+    def test_subscriber_calculate_debt_cost(self):
+        subscriber = Subscriber("Иванов", "LIB001", 5)
+        book1 = Book("Автор1", "Книга1", 2024, "Издательство", 100.0)
+        book2 = Book("Автор2", "Книга2", 2024, "Издательство", 200.0)
+
+        old_date = (datetime.now() - timedelta(days=40)).strftime("%Y-%m-%d")
+        subscriber.add_book(book1, old_date)
+        subscriber.add_book(book2, old_date)
+
+        assert subscriber.calculate_debt_cost() == 300.0
+
+    def test_subscriber_generate_debt(self):
+        subscriber = Subscriber("Иванов", "LIB001", 5)
+        book = Book("Автор", "Книга", 2024, "Издательство", 100.0)
+
+        old_date = (datetime.now() - timedelta(days=40)).strftime("%Y-%m-%d")
+        subscriber.add_book(book, old_date)
+
+        debt = subscriber.generate_debt()
+        assert isinstance(debt, Debt)
+        assert debt.total_cost == 100.0
+
+    def test_subscriber_addition_same_subscriber(self):
+        sub1 = Subscriber("Иванов", "LIB001", 10)
+        sub2 = Subscriber("Иванов", "LIB001", 15)
+
+        book1 = Book("Автор1", "Книга1", 2024, "Издательство", 100.0)
+        book2 = Book("Автор2", "Книга2", 2024, "Издательство", 200.0)
+
+        sub1.add_book(book1)
+        sub2.add_book(book2)
+
+        result = sub1 + sub2
+        assert len(result) == 2
+        assert result.size == 15
+
+    def test_subscriber_addition_different_subscriber(self):
+        sub1 = Subscriber("Иванов", "LIB001", 10)
+        sub2 = Subscriber("Петров", "LIB002", 10)
+
+        with pytest.raises(
+            ValueError, match="Можно объединять только карточки одного абонента"
+        ):
+            _ = sub1 + sub2
+
+    def test_subscriber_intersection(self):
+        sub1 = Subscriber("Иванов", "LIB001", 10)
+        sub2 = Subscriber("Петров", "LIB002", 10)
+
+        book1 = Book("Автор1", "Книга1", 2024, "Издательство", 100.0)
+        book2 = Book("Автор2", "Книга2", 2024, "Издательство", 200.0)
+
+        sub1.add_book(book1)
+        sub1.add_book(book2)
+        sub2.add_book(book1)
+
+        result = sub1 & sub2
+        assert len(result) == 1
+        assert result[0].book == book1
+
+    def test_subscriber_subtraction(self):
+        sub1 = Subscriber("Иванов", "LIB001", 10)
+        sub2 = Subscriber("Петров", "LIB002", 10)
+
+        book1 = Book("Автор1", "Книга1", 2024, "Издательство", 100.0)
+        book2 = Book("Автор2", "Книга2", 2024, "Издательство", 200.0)
+
+        sub1.add_book(book1)
+        sub1.add_book(book2)
+        sub2.add_book(book1)
+
+        result = sub1 - sub2
+        assert len(result) == 1
+        assert result[0].book == book2
+
+    def test_debt_creation(self):
+        book = Book("Автор", "Книга", 2024, "Издательство", 100.0)
+        borrowed = BorrowedBook(book, "2024-01-01")
+
+        debt = Debt("Иванов", "LIB001", [borrowed])
+
+        assert debt.subscriber_name == "Иванов"
+        assert debt.library_id == "LIB001"
+        assert len(debt.overdue_books) == 1
+        assert debt.total_cost == 100.0
