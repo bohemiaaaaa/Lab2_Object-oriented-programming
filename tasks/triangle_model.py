@@ -31,14 +31,10 @@ class RightTrianglePair:
             raise ValueError("Катеты должны быть положительными числами")
         self.__second = value
 
-    def read(self) -> None:
-        self.first = float(input("Введите первый катет: "))
-        self.second = float(input("Введите второй катет: "))
-
-    def display(self) -> None:
-        print(f"Первый катет: {self.first}")
-        print(f"Второй катет: {self.second}")
-        print(f"Гипотенуза: {self.hypotenuse:.2f}")
+    def edit(self) -> None:
+        """Редактирование катетов через консоль"""
+        self.first = float(input("Введите новый первый катет: "))
+        self.second = float(input("Введите новый второй катет: "))
 
     @property
     def hypotenuse(self) -> float:
@@ -67,91 +63,91 @@ class RightTrianglePair:
     def __lt__(self, other) -> bool:
         if isinstance(other, RightTrianglePair):
             return self.hypotenuse < other.hypotenuse
-        return NotImplemented
+        return False
 
     def __le__(self, other) -> bool:
         if isinstance(other, RightTrianglePair):
             return self.hypotenuse <= other.hypotenuse
-        return NotImplemented
+        return False
 
     def __gt__(self, other) -> bool:
         if isinstance(other, RightTrianglePair):
             return self.hypotenuse > other.hypotenuse
-        return NotImplemented
+        return False
 
     def __ge__(self, other) -> bool:
         if isinstance(other, RightTrianglePair):
             return self.hypotenuse >= other.hypotenuse
-        return NotImplemented
+        return False
 
-    def __add__(self, other):
+    def __add__(self, other) -> "RightTrianglePair":
         if isinstance(other, RightTrianglePair):
             return RightTrianglePair(
                 self.first + other.first, self.second + other.second
             )
-        return NotImplemented
+        return None
 
-    def __sub__(self, other):
+    def __sub__(self, other) -> "RightTrianglePair":
         if isinstance(other, RightTrianglePair):
             return RightTrianglePair(
                 max(0.1, self.first - other.first), max(0.1, self.second - other.second)
             )
-        return NotImplemented
+        return None
 
-    def __mul__(self, other):
+    def __mul__(self, other) -> "RightTrianglePair":
         if isinstance(other, (int, float)):
             return RightTrianglePair(self.first * other, self.second * other)
-        return NotImplemented
+        return None
 
-    def __truediv__(self, other):
+    def __truediv__(self, other) -> "RightTrianglePair":
         if isinstance(other, (int, float)):
             if other == 0:
                 raise ValueError("Деление на ноль")
             return RightTrianglePair(self.first / other, self.second / other)
-        return NotImplemented
+        return None
 
-    def __radd__(self, other):
+    def __radd__(self, other) -> "RightTrianglePair":
         return self + other
 
-    def __rsub__(self, other):
+    def __rsub__(self, other) -> "RightTrianglePair":
         if isinstance(other, (int, float)):
             return RightTrianglePair(
                 max(0.1, other - self.first), max(0.1, other - self.second)
             )
-        return NotImplemented
+        return None
 
-    def __rmul__(self, other):
+    def __rmul__(self, other) -> "RightTrianglePair":
         return self * other
 
-    def __iadd__(self, other):
+    def __iadd__(self, other) -> "RightTrianglePair":
         if isinstance(other, RightTrianglePair):
             self.first += other.first
             self.second += other.second
             return self
-        return NotImplemented
+        return None
 
-    def __isub__(self, other):
+    def __isub__(self, other) -> "RightTrianglePair":
         if isinstance(other, RightTrianglePair):
             self.first = max(0.1, self.first - other.first)
             self.second = max(0.1, self.second - other.second)
             return self
-        return NotImplemented
+        return None
 
-    def __imul__(self, other):
+    def __imul__(self, other) -> "RightTrianglePair":
         if isinstance(other, (int, float)):
             self.first *= other
             self.second *= other
             return self
-        return NotImplemented
+        return None
 
-    def __itruediv__(self, other):
+    def __itruediv__(self, other) -> "RightTrianglePair":
         if isinstance(other, (int, float)):
             if other == 0:
                 raise ValueError("Деление на ноль")
             self.first /= other
             self.second /= other
             return self
-        return NotImplemented
+        return None
 
     def __float__(self) -> float:
         return self.hypotenuse
@@ -165,7 +161,7 @@ class RightTrianglePair:
     def __call__(self) -> float:
         return self.hypotenuse
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> float:
         if index == 0:
             return self.first
         elif index == 1:
@@ -174,10 +170,10 @@ class RightTrianglePair:
             return self.hypotenuse
         raise IndexError("Index must be 0, 1 or 2")
 
-    def __len__(self):
+    def __len__(self) -> int:
         return 3
 
-    def __contains__(self, item):
+    def __contains__(self, item: float) -> bool:
         return item in [self.first, self.second, self.hypotenuse]
 
     def __iter__(self):

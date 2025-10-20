@@ -86,8 +86,27 @@ class Subscriber:
         self.count: int = 0
         self._books: list[BorrowedBook] = []
 
+    def edit(self) -> None:
+        """Редактирование данных абонента через консоль"""
+        self.name = input("Введите фамилию абонента: ")
+        self.library_id = input("Введите библиотечный номер: ")
+
     def get_size(self) -> int:
         return self.size
+
+    def __str__(self) -> str:
+        result = [
+            f"Абонент: {self.name}",
+            f"Библиотечный номер: {self.library_id}",
+            f"Книг на руках: {self.count}/{self.size}",
+            "Список книг:",
+        ]
+        for i, book in enumerate(self._books, 1):
+            result.append(f"  {i}. {book}")
+        return "\n".join(result)
+
+    def __repr__(self) -> str:
+        return f"Subscriber('{self.name}', '{self.library_id}', {self.size})"
 
     def __getitem__(self, index: int) -> BorrowedBook:
         if 0 <= index < len(self._books):
@@ -107,9 +126,9 @@ class Subscriber:
     def __contains__(self, book: Book) -> bool:
         return any(borrowed_book.book == book for borrowed_book in self._books)
 
-    def __add__(self, other):
+    def __add__(self, other) -> "Subscriber":
         if not isinstance(other, Subscriber):
-            return NotImplemented
+            return None
 
         if self.library_id != other.library_id:
             raise ValueError("Можно объединять только карточки одного абонента")
@@ -126,15 +145,14 @@ class Subscriber:
 
         return result
 
-    def __and__(self, other):
+    def __and__(self, other) -> "Subscriber":
         if not isinstance(other, Subscriber):
-            return NotImplemented
+            return None
 
         result = Subscriber(
             f"{self.name} & {other.name}", "intersection", self.MAX_SIZE
         )
         for book in self._books:
-            # Сравниваем книги по содержимому, а не по объектам
             if (
                 any(book.book == other_book.book for other_book in other._books)
                 and result.count < result.size
@@ -143,13 +161,12 @@ class Subscriber:
                 result.count += 1
         return result
 
-    def __sub__(self, other):
+    def __sub__(self, other) -> "Subscriber":
         if not isinstance(other, Subscriber):
-            return NotImplemented
+            return None
 
         result = Subscriber(self.name, self.library_id, self.size)
         for book in self._books:
-            # Сравниваем книги по содержимому, а не по объектам
             if (
                 not any(book.book == other_book.book for other_book in other._books)
                 and result.count < result.size
@@ -200,18 +217,6 @@ class Subscriber:
         overdue_books = self.find_overdue_books()
         return Debt(self.name, self.library_id, overdue_books)
 
-    def display(self) -> None:
-        print(f"Абонент: {self.name}")
-        print(f"Библиотечный номер: {self.library_id}")
-        print(f"Книг на руках: {self.count}/{self.size}")
-        print("Список книг:")
-        for i, book in enumerate(self._books, 1):
-            print(f"  {i}. {book}")
-
-    def read(self) -> None:
-        self.name = input("Введите фамилию абонента: ")
-        self.library_id = input("Введите библиотечный номер: ")
-
 
 class Debt:
     def __init__(
@@ -222,9 +227,12 @@ class Debt:
         self.overdue_books: list[BorrowedBook] = overdue_books
         self.total_cost: float = sum(book.book.price for book in overdue_books)
 
-    def display(self) -> None:
-        print(f"Долг абонента: {self.subscriber_name} ({self.library_id})")
-        print(f"Общая стоимость долга: {self.total_cost:.2f}")
-        print("Просроченные книги:")
+    def __str__(self) -> str:
+        result = [
+            f"Долг абонента: {self.subscriber_name} ({self.library_id})",
+            f"Общая стоимость долга: {self.total_cost:.2f}",
+            "Просроченные книги:",
+        ]
         for i, book in enumerate(self.overdue_books, 1):
-            print(f"  {i}. {book}")
+            result.append(f"  {i}. {book}")
+        return "\n".join(result)

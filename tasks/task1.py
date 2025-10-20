@@ -5,8 +5,10 @@ from triangle_model import RightTrianglePair
 
 if __name__ == "__main__":
     triangle = RightTrianglePair()
-    triangle.read()
-    triangle.display()
+    triangle.edit()
+
+    print("\nИнформация о треугольнике:")
+    print(triangle)
 
     print("\nИспользование перегруженных операторов:")
     print(f"str(triangle): {triangle}")
